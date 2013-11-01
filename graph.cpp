@@ -185,7 +185,7 @@ Graph::SuccessorsIter Graph::Find(const string& node) const{
 	return iter;
 }
 
-bool Graph::SaveGraph(const string &file_name) const{
+bool Graph::SaveGraphbyMatrix(const string &file_name) const{
 	if (graph_.nobes_number == 0) {
 		return 0;
 	} 
@@ -209,7 +209,7 @@ bool Graph::SaveGraph(const string &file_name) const{
 	}
 }
 
-bool Graph::LoadGraph(const string &file_name) {
+bool Graph::LoadGraphbyMatrix(const string &file_name) {
 	ifstream file(file_name);
 	string line_in_file;
 	int line_number = 0;
@@ -235,6 +235,63 @@ bool Graph::LoadGraph(const string &file_name) {
 						AddEdge(successors.at(line_number), successors.at(column_number), edge_value);
 					}
 					++column_number;
+				}
+			}
+			word_in_line.clear();
+			++line_number;
+		}
+		return 1;
+	}
+	return 0;
+}
+
+bool Graph::SaveGraphbySimple(const string &file_name) const{
+	if (graph_.nobes_number == 0) {
+		return 0;
+	} 
+	else {
+		ofstream file(file_name);
+		for (ConstSuccessorsIter successors_iter = graph_.successors_list->begin();
+			successors_iter != graph_.successors_list->end(); ++successors_iter) {
+				file << successors_iter->node_value << " ";
+		}
+		file << '\n';
+		for (ConstSuccessorsIter successors_iter = graph_.successors_list->begin();
+			successors_iter != graph_.successors_list->end(); ++successors_iter) {
+				file << successors_iter->node_value;
+				for (ConstNodesIter nodes_iter = successors_iter->nodes_list->begin();
+					nodes_iter != successors_iter->nodes_list->end(); ++nodes_iter) {
+					file << " " << nodes_iter->node_value << " " << nodes_iter->edge_value;
+				}
+				file << '\n';
+		}
+		return 1;
+	}
+}
+
+bool Graph::LoadGraphbySimple(const string &file_name) {
+	ifstream file(file_name);
+	string line_in_file;
+	int line_number = 0;
+	istringstream word_in_line;
+	vector<string> successors;
+	if (file.good()) {
+		while (getline(file, line_in_file, '\n')) {			
+			word_in_line.str(line_in_file);
+			//第一行，添加各node
+			if (line_number == 0) {
+				string word;
+				while(word_in_line >> word) {
+					successors.push_back(word);
+				}
+				AddNode(successors);
+			}//其他行，处理nodes之间边关系
+			else {
+				string successor, node;
+				float node_value;
+				word_in_line >> successor;
+				while(word_in_line >> node >> node_value) {
+					AddEdge(successor, node, node_value);
 				}
 			}
 			word_in_line.clear();

@@ -88,11 +88,17 @@ public:
 	ConstSuccessorsIter Nbegin() const {return graph_.successors_list->begin();}
 	ConstSuccessorsIter Nend() const {return graph_.successors_list->end();}
 
-	//将图存外设,返回1成功，返回0失败
-	bool SaveGraph(const string &file_name) const;
+	//将图存外设为矩阵结构,返回1成功，返回0失败
+	bool SaveGraphbyMatrix(const string &file_name) const;
 
-	//从外设取图结构，返回1成功，返回0失败
-	bool LoadGraph(const string &file_name);
+	//从外设取矩阵结构的图，返回1成功，返回0失败
+	bool LoadGraphbyMatrix(const string &file_name);
+
+	//将图存外设为简单结构,返回1成功，返回0失败
+	bool SaveGraphbySimple(const string &file_name) const;
+
+	//从外设取简单结构表示的图，返回1成功，返回0失败
+	bool LoadGraphbySimple(const string &file_name);
 
 	//查找相关出度节点
 	float SearchOutdegreeNode(ConstNodesIter &begin, ConstNodesIter &end, const string &target) const;
