@@ -156,10 +156,10 @@ int Graph::GetOutDegree( const string &node ) {
 bool Graph::HasEdge( const string &node1, const string &node2 ) {
 	SuccessorsIter successors_iter;
 	if (HasNode(node1, successors_iter) && HasNode(node2)) {
-		Node node_temp = {0, 0, node2};
-		if (binary_search(successors_iter->nodes_list->begin(),
-			successors_iter->nodes_list->end(),
-			node_temp, CompareNodes())) return 1;
+		//Node node_temp = {0, 0, node2};
+		if (find_if(successors_iter->nodes_list->begin(),
+			successors_iter->nodes_list->end(),IsEqualNodes(node2)) != 
+			successors_iter->nodes_list->end()) return 1;
 		return 0;
 	}
 	return 0;
@@ -334,6 +334,9 @@ void Graph::CalEdgeValue( const string &q_img )
 			}
 		}
 	}
+	sort(two_hop.begin(), two_hop.end(), CompareNodes());
+	vector<Node>::iterator two_hop_unique_iter = unique(two_hop.begin(), two_hop.end(), CompareUniqueNodes);
+	two_hop.erase(two_hop_unique_iter, two_hop.end());
 	//º∆À„jaccard coefficient
 	vector<Node> q_outdegree, d_outdegree;
 	for (SuccessorsIter siter = Nbegin(); siter != Nend(); ++siter) {
@@ -362,10 +365,10 @@ void Graph::CalEdgeValue( const string &q_img )
 					path1 = 2;
 				}
 				if (find_if(one_hop.begin(), one_hop.end(), IsEqualNodes(niter->node_value)) != one_hop.end()) {
-					path1 = 1;
+					path2 = 1;
 				} 
 				else if (find_if(two_hop.begin(), two_hop.end(), IsEqualNodes(niter->node_value)) != two_hop.end()) {
-					path1 = 2;
+					path2 = 2;
 				}
 				
 				float edge_value = jaccard_coefficient * pow(a0, path1 > path2 ? path1 : path2);
