@@ -1,4 +1,5 @@
 #include "GraphFusion.h"
+#include "dot.h"
 #include <iterator>
 using std::back_inserter;
 
@@ -38,11 +39,16 @@ void GraphFusion::BuildQueryGraph(const string &query_img,
 		iter->nodes_list->assign(prior_iter->nodes_list->begin(), prior_iter->nodes_list->end());
 		for (Graph::NodesIter node_iter = prior_iter->nodes_list->begin(); 
 			node_iter != prior_iter->nodes_list->end(); ++node_iter) {
-				if (find(leaf_imgs.begin(), leaf_imgs.end(), node_iter->node_value) == leaf_imgs.end()) {
+				if (find(leaf_imgs.begin(), leaf_imgs.end(), node_iter->node_value) == leaf_imgs.end() &&
+					node_iter->node_value != query_img) {
 					grandson_nodes.push_back(node_iter->node_value);
 				}
 		}
 	}	
+	sort(grandson_nodes.begin(), grandson_nodes.end());
+	vector<string>::iterator unique_iter = unique(grandson_nodes.begin(), 
+		grandson_nodes.end());
+	grandson_nodes.erase(unique_iter, grandson_nodes.end());
 	//处理孙节点
 	for (vector<string>::iterator iter = grandson_nodes.begin(); iter != grandson_nodes.end(); ++iter) {
 		query_graph.AddNode(*iter);
@@ -54,15 +60,20 @@ void GraphFusion::BuildQueryGraph(const string &query_img,
 			nodes_iter != prior_iter->nodes_list->end(); ++nodes_iter) {
 				if (find_if(query_graph.Nbegin(), query_graph.Nend(), 
 					IsEqualSuccessors(nodes_iter->node_value)) != query_graph.Nend()) {
-						query_graph_iter->nodes_list->push_back(*nodes_iter);
+						query_graph_iter->nodes_list->push_back(*nodes_iter);						
 				}
 		}
 	}
 	//加入query节点
 	query_graph.AddNode(query_img);
+	Graph::SuccessorsIter query_graph_iter = query_graph.Find(query_img);
 	for (vector<string>::const_iterator iter = leaf_imgs.begin(); iter != leaf_imgs.end(); ++iter) {
-		query_graph.AddEdge(query_img, *iter, 1);
+		Node node_temp = {0, 1, *iter};
+		query_graph_iter->nodes_list->push_back(node_temp);
 	}
+	//test
+	Dot fusion_dot1(&query_graph);
+	fusion_dot1.CreatDotFile("D:\\projectresult\\fusion3_dot.txt");
 	query_graph.CalEdgeValue(query_img);
 }
 
@@ -118,7 +129,11 @@ void GraphFusion::Fuse(const string &query_img,
 	Graph query_graph1(prior_graphs1_->GetAlgorithm());
 	Graph query_graph2(prior_graphs2_->GetAlgorithm());
 	BuildQueryGraph(query_img, leaf_imgs1, query_graph1);
+	Dot fusion_dot1(&query_graph1);
+	fusion_dot1.CreatDotFile("D:\\projectresult\\fusion1_dot.txt");
 	BuildQueryGraph(query_img, leaf_imgs2, query_graph2);
+	Dot fusion_dot2(&query_graph2);
+	fusion_dot2.CreatDotFile("D:\\projectresult\\fusion2_dot.txt");
 	FuseQueryGraphs(query_graph1, query_graph2);
 }
 
