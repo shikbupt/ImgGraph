@@ -12,11 +12,12 @@ using std::stringstream;
 class Graph;
 class Dot {
 public:
-	Dot(Graph* g) : graph_(g){}	
+	Dot(Graph* g) : graph_(g){SetStat();}	
 	void CreatDotFile(const string& file_path);
 private:
 	void Edges2Dot();
 	void Nodes2Dot();
+	void SetStat();
 	stringstream string_buffer_;
 	Graph *graph_;
 };
