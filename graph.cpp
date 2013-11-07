@@ -131,14 +131,12 @@ bool Graph::SetEdgeValue(const string &node1, const string &node2, float edge_va
 		SuccessorsIter successor1_iter = Find(node1);
 		SuccessorsIter successor2_iter = Find(node2);
 
-		Node node_temp = {0, 0, node2};
-		NodesIter node1_iter = lower_bound(successor1_iter->nodes_list->begin(),
-			successor1_iter->nodes_list->end(), node_temp, CompareNodes());
+		NodesIter node1_iter = find_if(successor1_iter->nodes_list->begin(),
+			successor1_iter->nodes_list->end(), IsEqualNodes(node2));
 		node1_iter->edge_value = edge_value;
 
-		node_temp.node_value = node1;
-		NodesIter node2_iter = lower_bound(successor2_iter->nodes_list->begin(),
-			successor2_iter->nodes_list->end(), node_temp, CompareNodes());
+		NodesIter node2_iter = find_if(successor2_iter->nodes_list->begin(),
+			successor2_iter->nodes_list->end(), IsEqualNodes(node1));
 		node2_iter->edge_value = edge_value;
 
 		return 1;
@@ -156,7 +154,6 @@ int Graph::GetOutDegree( const string &node ) {
 bool Graph::HasEdge( const string &node1, const string &node2 ) {
 	SuccessorsIter successors_iter;
 	if (HasNode(node1, successors_iter) && HasNode(node2)) {
-		//Node node_temp = {0, 0, node2};
 		if (find_if(successors_iter->nodes_list->begin(),
 			successors_iter->nodes_list->end(),IsEqualNodes(node2)) != 
 			successors_iter->nodes_list->end()) return 1;
@@ -306,15 +303,13 @@ void Graph::SetNodeStat( const string &node1, const string &node2, bool stat )
 {
 	SuccessorsIter successor1_iter = Find(node1);
 	SuccessorsIter successor2_iter = Find(node2);
-
-	Node node_temp = {0, 0, node2};
-	NodesIter node1_iter = lower_bound(successor1_iter->nodes_list->begin(),
-		successor1_iter->nodes_list->end(), node_temp, CompareNodes());
+	
+	NodesIter node1_iter = find_if(successor1_iter->nodes_list->begin(),
+		successor1_iter->nodes_list->end(), IsEqualNodes(node2));
 	node1_iter->stat.is_cal = stat;
 
-	node_temp.node_value = node1;
-	NodesIter node2_iter = lower_bound(successor2_iter->nodes_list->begin(),
-		successor2_iter->nodes_list->end(), node_temp, CompareNodes());
+	NodesIter node2_iter = find_if(successor2_iter->nodes_list->begin(),
+		successor2_iter->nodes_list->end(), IsEqualNodes(node1));
 	node2_iter->stat.is_cal = stat;
 }
 
