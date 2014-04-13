@@ -111,6 +111,7 @@ private:
 };
 
 void MaxWeightDensity::Rank(const string &query_img, const Graph &fusion_graph, vector<string> &ranked) {	
+	ranked.clear();
 	ranked.push_back(query_img);
 	Graph::ConstSuccessorsIter iter = fusion_graph.Find(query_img);
 	list<Node> candidate(iter->nodes_list->begin(), iter->nodes_list->end());
